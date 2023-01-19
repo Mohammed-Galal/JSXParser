@@ -1,12 +1,12 @@
-const catchScripts = require("./scriptsCatcher.js"),
-  { emptyStr, openingTagExp } = require("./commonAssets.js");
+import catchScripts from "./scriptsCatcher.js";
+import { openingTagExp, emptyStr } from "./commonAssets.js";
 
-module.exports = (function () {
+export default (function () {
   const domArrSplitExp = /(?=\<|\/>)|(?<=\>)/g,
     isTxtContent = /^[^</]/,
     catchFirstSpaceExp = /(?<=^\S+)\s+/g,
     isComponentExp = /^[A-Z]|\./g,
-    spaceRemovalExp = /(?<=>)\s+/g,
+    spaceRemovalExp = /(?<=\>)\s+/g,
     trimCharsExp = /^\<|\>$/g;
 
   let siblings = null,
@@ -29,9 +29,10 @@ module.exports = (function () {
 
   function parseXML() {
     const item = domArr[index++];
-
-    if (isTxtContent.test(item)) siblings.push(item);
-    else if (openingTagExp.test(item)) {
+    if (isTxtContent.test(item)) {
+      siblings.push(item);
+      parseXML();
+    } else if (openingTagExp.test(item)) {
       const node = item
           .replace(trimCharsExp, emptyStr)
           .split(catchFirstSpaceExp),
@@ -53,9 +54,8 @@ module.exports = (function () {
       const N = [tag, attrs, children];
       if (prevSiblings === null) return N;
       prevSiblings.push(N);
+      parseXML();
     }
-
-    if (index < endPos) parseXML();
   }
 
   function reset() {
