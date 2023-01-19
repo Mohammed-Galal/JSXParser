@@ -1,13 +1,13 @@
 import catchScripts from "./scriptsCatcher.js";
-import { openingTagExp, emptyStr } from "./commonAssets.js";
+import { openingTagExp, closingTagExp, emptyStr } from "./commonAssets.js";
 
 export default (function () {
-  const domArrSplitExp = /(?=\<|\/>)|(?<=\>)/g,
+  const domArrSplitExp = /(?=\<|\/\>)|(?<=\>)/g,
     isTxtContent = /^[^</]/,
     catchFirstSpaceExp = /(?<=^\S+)\s+/g,
     isComponentExp = /^[A-Z]|\./g,
     spaceRemovalExp = /(?<=\>)\s+/g,
-    trimCharsExp = /^\<|\>$/g;
+    trimCharsExp = /^\<|\s*\/?\>$/g;
 
   let siblings = null,
     domArr = null,
@@ -29,10 +29,8 @@ export default (function () {
 
   function parseXML() {
     const item = domArr[index++];
-    if (isTxtContent.test(item)) {
-      siblings.push(item);
-      parseXML();
-    } else if (openingTagExp.test(item)) {
+    if (isTxtContent.test(item)) siblings.push(item);
+    else if (openingTagExp.test(item)) {
       const node = item
           .replace(trimCharsExp, emptyStr)
           .split(catchFirstSpaceExp),
@@ -54,8 +52,9 @@ export default (function () {
       const N = [tag, attrs, children];
       if (prevSiblings === null) return N;
       prevSiblings.push(N);
-      parseXML();
     }
+
+    if (closingTagExp.test(item) === false) parseXML();
   }
 
   function reset() {
