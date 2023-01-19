@@ -1,12 +1,12 @@
-import { cut, openingTagExp, emptyStr } from "./commonAssets.js";
+import { closingTagExp, openingTagExp, emptyStr } from "./commonAssets.js";
 import parse from "./xmlParser.js";
 
 export default (function () {
-  const isNum = Number.isInteger,
-    closingTagExp = /\/(\S+)?\>$/,
+  const cut = String.prototype.slice === undefined ? "substring" : "slice",
+    isNum = Number.isInteger,
     fragExp = /\<\/?\>|(?<=\>)\s+/g,
     rootCheckExp = /\<\w/g,
-    fileSplitter = /(?=\<\w)|(?<=(\/|\/\S)*?\>)/g;
+    fileSplitter = /(?=\<\w)|(?<=\/\S*\>)/g;
 
   let raw = [],
     roots = [],
@@ -46,7 +46,7 @@ export default (function () {
       }
     } else raw.push(item);
 
-    if (index < endPos) collectRoots();
+    if (endPos > index) collectRoots();
   }
 
   function reset() {
