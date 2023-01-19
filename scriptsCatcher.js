@@ -56,33 +56,7 @@ module.exports = (function () {
       scriptHolder.push(item);
     }
 
-    catchScript();
-    // if (openScripts > 0) {
-    //   const item = str[currentPos++];
-    //   if (item === closingScriptTag && --openScripts === 0) {
-    //     const result = scriptHolder.join(emptyStr);
-    //     const resIndex = scripts.indexOf(result);
-    //     scriptHolder.length = 0;
-    //     pureContent.push(
-    //       resIndex > -1 ? resIndex : scripts.push(result) - 1,
-    //       item
-    //     );
-    //     return catchScript();
-    //   } else {
-    //     if (item === openScriptTag) openScripts++;
-    //     scriptHolder.push(item);
-    //     catchScript();
-    //   }
-    // } else {
-    //   const startPos = currentPos;
-    //   currentPos = str.indexOf(openScriptTag, startPos);
-    //   const isExisted = currentPos > -1;
-    //   pureContent.push(str[cut](startPos, isExisted ? ++currentPos : endPos));
-    //   if (isExisted) {
-    //     openScripts = 1;
-    //     catchScript();
-    //   }
-    // }
+    if (currentPos < endPos) catchScript();
   }
 
   function reset() {
