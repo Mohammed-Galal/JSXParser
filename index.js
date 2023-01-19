@@ -1,12 +1,12 @@
-const { cut, openingTagExp, emptyStr } = require("./commonAssets.js"),
-  parse = require("./xmlParser.js");
+import { cut, openingTagExp, emptyStr } from "./commonAssets.js";
+import parse from "./xmlParser.js";
 
-module.exports = (function () {
+export default (function () {
   const isNum = Number.isInteger,
     closingTagExp = /\/(\S+)?\>$/,
-    fragExp = /\<\/?\>/g,
+    fragExp = /\<\/?\>|(?<=\>)\s+/g,
     rootCheckExp = /\<\w/g,
-    fileSplitter = /(?=\<\w)|(?<=\/([^\s/>]+)?\>)/g;
+    fileSplitter = /(?=\<\w)|(?<=(\/|\/\S)*?\>)/g;
 
   let raw = [],
     roots = [],
@@ -23,7 +23,7 @@ module.exports = (function () {
   function start(fileContent) {
     const fragFilled = fileContent.replace(fragExp, replacer);
     if (rootCheckExp.test(fragFilled)) {
-      content = fragFilled.split(fileSplitter);
+      content = fragFilled.split(fileSplitter).filter(Boolean);
       endPos = content.length;
       collectRoots();
       const result = raw.map(filter).join(emptyStr);
@@ -78,6 +78,6 @@ module.exports = (function () {
   }
 
   function replacer(m) {
-    return m[cut](0, -1) + "fragment>";
+    return m[0] === "<" ? m[cut](0, -1) + "fragment>" : emptyStr;
   }
 })();
