@@ -1,3 +1,3 @@
 export const emptyStr = "",
-  cut = String.prototype.slice === undefined ? "substring" : "slice",
+  closingTagExp = /\/\S*\>$/,
   openingTagExp = /^\<\w/;
