@@ -1,6 +1,6 @@
-const { emptyStr, cut } = require("./commonAssets.js");
+import { cut, emptyStr } from "./commonAssets.js";
 
-module.exports = (function () {
+export default (function () {
   const openScriptTag = "{",
     closingScriptTag = "}",
     openScriptTagExp = /\{/;
@@ -51,12 +51,12 @@ module.exports = (function () {
         resIndex > -1 ? resIndex : scripts.push(result) - 1,
         item
       );
+      catchScript();
     } else {
       if (item === openScriptTag) openScripts++;
       scriptHolder.push(item);
+      catchScript();
     }
-
-    if (currentPos < endPos) catchScript();
   }
 
   function reset() {
