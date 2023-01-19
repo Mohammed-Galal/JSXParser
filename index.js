@@ -6,7 +6,7 @@ module.exports = (function () {
     closingTagExp = /\/(\S+)?\>$/,
     fragExp = /\<\/?\>/g,
     rootCheckExp = /\<\w/g,
-    fileSplitter = /(?=\<\w)|(?<=\/(\S+)?\>)/g;
+    fileSplitter = /(?=\<\w)|(?<=\/([^\s/>]+)?\>)/g;
 
   let raw = [],
     roots = [],
@@ -21,8 +21,9 @@ module.exports = (function () {
   return start;
 
   function start(fileContent) {
-    if (rootCheckExp.test(fileContent)) {
-      content = fileContent.replace(fragExp, replacer).split(fileSplitter);
+    const fragFilled = fileContent.replace(fragExp, replacer);
+    if (rootCheckExp.test(fragFilled)) {
+      content = fragFilled.split(fileSplitter);
       endPos = content.length;
       collectRoots();
       const result = raw.map(filter).join(emptyStr);
@@ -50,17 +51,17 @@ module.exports = (function () {
 
   function reset() {
     if (openRoots > 0) throw "unhandled Root Element";
-    index = raw.length = roots.length = rootHolder.length = 0;
+    content.length = index = raw.length = roots.length = rootHolder.length = 0;
     endPos = content = null;
   }
 
-  function filter(c, key) {
+  function filter(c) {
     if (isNum(c)) {
       const component = parse(roots[c]);
       return (
         "{\n\t" +
         "key:" +
-        key +
+        c +
         ",\n\t" +
         "scripts:[" +
         component.scripts.map(start) +
