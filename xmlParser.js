@@ -2,12 +2,11 @@ import catchScripts from "./scriptsCatcher.js";
 import { openingTagExp, closingTagExp, emptyStr } from "./commonAssets.js";
 
 export default (function () {
-  const domArrSplitExp = /(?=\<|\/\>)|(?<=\>)/g,
+  const domArrSplitExp = /(?=\<|\/\>)|(?<=\>)\s*/g,
     isTxtContent = /^[^</]/,
     catchFirstSpaceExp = /(?<=^\S+)\s+/g,
     isComponentExp = /^[A-Z]|\./g,
-    spaceRemovalExp = /(?<=\>)\s+/g,
-    trimCharsExp = /^\<|\s*\/?\>$/g;
+    trimCharsExp = /^\<|\s+\>?$/g;
 
   let siblings = null,
     domArr = null,
@@ -17,7 +16,7 @@ export default (function () {
 
   return function (str) {
     const obj = catchScripts(str);
-    domArr = obj.input.replace(spaceRemovalExp, emptyStr).split(domArrSplitExp);
+    domArr = obj.input.split(domArrSplitExp);
     endPos = domArr.length;
     components = [];
     obj.dom = parseXML();
