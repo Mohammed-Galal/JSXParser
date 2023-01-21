@@ -1,12 +1,13 @@
-import { closingTagExp, openingTagExp, emptyStr } from "./commonAssets.js";
+import { openingTagExp, emptyStr } from "./commonAssets.js";
 import parse from "./xmlParser.js";
 
 export default (function () {
   const cut = String.prototype.slice === undefined ? "substring" : "slice",
     isNum = Number.isInteger,
+    closingTagExp = /^<\/\w|\/>$/,
     fragExp = /\<\/?\>/g,
     rootCheckExp = /\<\w/g,
-    fileSplitter = /(?=\<\w)|(?<=\/\S*\>)/g;
+    fileSplitter = /(?=\<\/?\w)|(?<=\>)/g;
 
   let raw = [],
     roots = [],
