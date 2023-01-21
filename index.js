@@ -4,7 +4,7 @@ import parse from "./xmlParser.js";
 export default (function () {
   const cut = String.prototype.slice === undefined ? "substring" : "slice",
     isNum = Number.isInteger,
-    fragExp = /\<\/?\>|(?<=\>)\s+/g,
+    fragExp = /\<\/?\>/g,
     rootCheckExp = /\<\w/g,
     fileSplitter = /(?=\<\w)|(?<=\/\S*\>)/g;
 
@@ -78,6 +78,6 @@ export default (function () {
   }
 
   function replacer(m) {
-    return m[0] === "<" ? m[cut](0, -1) + "fragment>" : emptyStr;
+    return m[cut](0, -1) + "fragment>";
   }
 })();
