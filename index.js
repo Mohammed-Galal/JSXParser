@@ -11,22 +11,15 @@ export default (function () {
 
   let raw = [],
     roots = [],
-    rootHolder = [];
-
-  let content = null,
-    endPos = null;
-
-  let openRoots = 0,
-    index = 0;
+    rootHolder = [],
+    openRoots = 0;
 
   return start;
 
   function start(fileContent) {
     const fragFilled = fileContent.replace(fragExp, replacer);
     if (rootCheckExp.test(fragFilled)) {
-      content = fragFilled.split(fileSplitter).filter(Boolean);
-      endPos = content.length;
-      collectRoots();
+      fragFilled.split(fileSplitter).forEach(collectRoots);
       const result = raw.map(filter).join(emptyStr);
       reset();
       return result;
@@ -34,9 +27,7 @@ export default (function () {
     return fileContent;
   }
 
-  function collectRoots() {
-    const item = content[index++];
-
+  function collectRoots(item) {
     if (openingTagExp.test(item)) openRoots++;
     if (openRoots > 0) {
       rootHolder.push(item);
@@ -46,14 +37,11 @@ export default (function () {
         rootHolder.length = 0;
       }
     } else raw.push(item);
-
-    if (endPos > index) collectRoots();
   }
 
   function reset() {
     if (openRoots > 0) throw "unhandled Root Element";
-    content.length = index = raw.length = roots.length = rootHolder.length = 0;
-    endPos = content = null;
+    raw.length = roots.length = rootHolder.length = 0;
   }
 
   function filter(c) {
