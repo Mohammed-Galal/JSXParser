@@ -17,7 +17,9 @@ export default (function () {
     openScripts = 0;
 
   return function (str) {
-    if (hasScripts.test(str)) {
+    const matched = str.match(splitterExp);
+    if (matched && matched.length % 2 !== 0) throw "unhandled Script";
+    else if (hasScripts.test(str)) {
       domArr = str.split(splitterExp);
       endPos = str.length;
       catchScript();
@@ -35,24 +37,21 @@ export default (function () {
     const item = domArr[currentPos++];
 
     if (openScripts === 0) pureContent.push(item);
-    else {
-      if (closingScriptTag.test(item) && --openScripts === 0) {
-        const result = scriptHolder.join(emptyStr);
-        const resIndex = scripts.indexOf(result);
-        scriptHolder.length = 0;
-        pureContent.push(
-          resIndex > -1 ? resIndex : scripts.push(result) - 1,
-          item
-        );
-      } else scriptHolder.push(item);
-    }
+    else if (closingScriptTag.test(item) && --openScripts === 0) {
+      const result = scriptHolder.join(emptyStr);
+      const resIndex = scripts.indexOf(result);
+      scriptHolder.length = 0;
+      pureContent.push(
+        resIndex > -1 ? resIndex : scripts.push(result) - 1,
+        item
+      );
+    } else scriptHolder.push(item);
 
     if (openScriptTagExp.test(item)) openScripts++;
     if (endPos > currentPos) catchScript();
   }
 
   function reset() {
-    if (openScripts > 0) throw "unhandled Script";
     currentPos = 0;
     scripts = [];
     scriptHolder = [];
