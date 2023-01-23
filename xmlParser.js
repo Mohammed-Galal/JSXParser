@@ -52,9 +52,9 @@ export default (function () {
       parseXML();
       siblings = prevSiblings;
       if (prevSiblings === null) return N;
-      prevSiblings.push(N);
-      parseXML();
-    } else if (isNotClosingTag) {
+    } 
+    
+    if (isNotClosingTag) {
       siblings.push(item);
       parseXML();
     }
