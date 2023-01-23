@@ -27,7 +27,7 @@ export default (function () {
   };
 
   function parseXML() {
-    const item = domArr[index++],
+    let item = domArr[index++],
       isNotClosingTag = closingTagExp.test(item) === false;
 
     if (openingTagExp.test(item)) {
@@ -45,13 +45,13 @@ export default (function () {
         attrs = node[1] || null,
         children = [];
 
-      const N = [tag, attrs, children],
+      item = [tag, attrs, children],
         prevSiblings = siblings;
 
       siblings = children;
       parseXML();
       siblings = prevSiblings;
-      if (prevSiblings === null) return N;
+      if (prevSiblings === null) return item;
     } 
     
     if (isNotClosingTag) {
