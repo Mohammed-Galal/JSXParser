@@ -27,8 +27,8 @@ export default (function () {
   };
 
   function parseXML() {
-    const item = domArr[index++],
-      isNotClosingTag = closingTagExp.test(item) === false;
+    let item = domArr[index++];
+    const isNotClosingTag = closingTagExp.test(item) === false;
 
     if (openingTagExp.test(item)) {
       const node = item
@@ -45,17 +45,16 @@ export default (function () {
         attrs = node[1] || null,
         children = [];
 
-      const N = [tag, attrs, children],
-        prevSiblings = siblings;
+      item = [tag, attrs, children];
 
       const prevSiblings = siblings;
       siblings = children;
       parseXML();
       siblings = prevSiblings;
-      if (prevSiblings === null) return N;
-      prevSiblings.push(N);
-      parseXML();
-    } else if (isNotClosingTag) {
+      if (prevSiblings === null) return item;
+    }
+
+    if (isNotClosingTag) {
       siblings.push(item);
       parseXML();
     }
