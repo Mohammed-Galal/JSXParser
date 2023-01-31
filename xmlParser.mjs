@@ -42,7 +42,7 @@ export default (function () {
           }
           return tagName;
         })(),
-        attrs = node[1] || null;
+        attrs = node[1] && node[1].split(/\s+(?=\S+\=)/g);
 
       item = [tag, attrs];
 
