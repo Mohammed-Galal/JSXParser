@@ -1,13 +1,14 @@
 import catchScripts from "./scriptsCatcher.mjs";
 import { openingTagExp, emptyStr } from "./commonAssets.mjs";
 
-export default (function () {
-  const domArrSplitExp = /(?=\<|\/\>)|\>\s*/g,
-    closingTagExp = /^\<?\/\w?/,
-    catchFirstSpaceExp = /(?<=^\S+)\s+/g,
-    isComponentExp = /^[A-Z]|\./g,
-    trimCharsExp = /^\<|\s*$/g;
+const domArrSplitExp = /(?=\<|\/\>)|\>\s*/g,
+  closingTagExp = /^\<?\/\w?/,
+  catchFirstSpaceExp = /(?<=^\S+)\s+/g,
+  isComponentExp = /^[A-Z]|\./g,
+  trimCharsExp = /^\<|\s*$/g,
+  attrsParseExp = /\s+(?=\S+\=)/g;
 
+export default (function () {
   let siblings = null,
     domArr = null,
     components = null,
@@ -42,7 +43,7 @@ export default (function () {
           }
           return tagName;
         })(),
-        attrs = node[1] && node[1].split(/\s+(?=\S+\=)/g);
+        attrs = node[1] ? node[1].split(attrsParseExp) : null;
 
       item = [tag, attrs];
 
