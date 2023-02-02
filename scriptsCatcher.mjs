@@ -1,11 +1,11 @@
 import { emptyStr } from "./commonAssets.mjs";
 
-export default (function () {
-  const splitterExp = /(?<=\{)|(?=\})/g,
-    openScriptTagExp = /\{$/,
-    closingScriptTag = /^\}/,
-    hasScripts = /\{/;
+const splitterExp = /(?<=\{)|(?=\})/g,
+  openScriptTagExp = /\{$/,
+  closingScriptTag = /^\}/,
+  hasScripts = /\{/;
 
+export default (function () {
   let scripts = [],
     scriptHolder = [],
     pureContent = [],

@@ -1,14 +1,14 @@
 import { openingTagExp, emptyStr } from "./commonAssets.mjs";
 import parse from "./xmlParser.mjs";
 
-export default (function () {
-  const cut = String.prototype.slice === undefined ? "substring" : "slice",
-    isNum = Number.isInteger,
-    closingTagExp = /^<\/\w|\/>$/,
-    fragExp = /\<\/?\>/g,
-    rootCheckExp = /\<\w/g,
-    fileSplitter = /(?=\<\/?\w)|(?<=\>)/g;
+const cut = String.prototype.slice === undefined ? "substring" : "slice",
+  isNum = Number.isInteger,
+  closingTagExp = /^<\/\w|\/>$/,
+  fragExp = /\<\/?\>/g,
+  rootCheckExp = /\<\w/g,
+  fileSplitter = /(?=\<\/?\w)|(?<=\>)/g;
 
+export default (function () {
   let raw = [],
     roots = [],
     rootHolder = [],
