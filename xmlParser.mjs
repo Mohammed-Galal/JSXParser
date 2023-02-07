@@ -64,10 +64,8 @@ export default (function () {
   }
 
   function parseStr(str) {
-    if (str !== emptyStr) {
-      const Num = Number(str.slice(1, -1));
-      siblings.push(Num || str);
-    }
+    if (str !== emptyStr)
+      siblings.push(str[0] === "{" ? Number(str.slice(1, -1)) : str);
   }
 
   function reset() {
