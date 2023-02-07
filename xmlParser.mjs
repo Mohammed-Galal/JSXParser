@@ -58,8 +58,15 @@ export default (function () {
     }
 
     if (isNotClosingTag) {
-      siblings.push(item);
+      item.split(/(?=\{)|(?<=\})/g).forEach(parseStr);
       parseXML();
+    }
+  }
+
+  function parseStr(str) {
+    if (str !== emptyStr) {
+      const Num = Number(str.slice(1, -1));
+      siblings.push(Num || str);
     }
   }
 
