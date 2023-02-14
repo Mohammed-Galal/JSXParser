@@ -6,7 +6,7 @@ const domArrSplitExp = /(?=\<|\/\>)|\>\s*/g,
   catchFirstSpaceExp = /(?<=^\S+)\s+/g,
   isComponentExp = /^[A-Z]|\./g,
   trimCharsExp = /^\<|\s*$/g,
-  attrsParseExp = /\s+(?=\S+\=)/g;
+  attrsParseExp = /\s+(?=\S+\=|\{\d+\})/g;
 
 let siblings = null,
   domArr = null,
