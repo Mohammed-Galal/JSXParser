@@ -5,64 +5,59 @@ const cut = String.prototype.slice === undefined ? "substring" : "slice",
   isNum = Number.isInteger,
   closingTagExp = /^<\/\w|\/>$/,
   fragExp = /\<\/?\>/g,
-  rootCheckExp = /\<\w/g,
+  rootCheckExp = /\<\w/,
   fileSplitter = /(?=\<\/?\w)|(?<=\>)/g;
 
-let raw = [],
-  roots = [],
-  rootHolder = [],
+let rootHolder = [],
   openRoots = 0;
 
 export default start;
-
-function start(fileContent) {
-  const fragFilled = fileContent.replace(fragExp, replacer);
-  if (rootCheckExp.test(fragFilled)) {
-    fragFilled.split(fileSplitter).forEach(collectRoots);
-    const result = raw.map(filter).join(emptyStr);
-    reset();
-    return result;
-  }
-  return fileContent;
+function start(content) {
+  const fragFilled = content.replace(fragExp, replacer),
+    balanced = rootCheckExp.test(fragFilled);
+  return balanced ? parseContent(content.split(fileSplitter)) : content;
 }
 
-function collectRoots(item) {
-  if (openingTagExp.test(item)) openRoots++;
-  if (openRoots > 0) {
-    rootHolder.push(item);
-    if (closingTagExp.test(item) && --openRoots === 0) {
-      const result = rootHolder.join(emptyStr);
-      raw.push(roots.push(result) - 1);
-      rootHolder.length = 0;
+function parseContent(contentArr) {
+  const roots = [],
+    raw = [];
+
+  contentArr.forEach(collectRoots);
+  return raw.map(filter).join(emptyStr);
+
+  function collectRoots(item) {
+    if (openingTagExp.test(item)) openRoots++;
+    if (openRoots > 0) {
+      rootHolder.push(item);
+      if (closingTagExp.test(item) && --openRoots === 0) {
+        const result = rootHolder.join(emptyStr);
+        raw.push(roots.push(result) - 1);
+        rootHolder.length = 0;
+      }
+    } else raw.push(item);
+  }
+
+  function filter(c) {
+    if (isNum(c)) {
+      const component = parse(roots[c]);
+      return (
+        "{\n\t" +
+        "key:" +
+        c +
+        ",\n\t" +
+        "scripts:[" +
+        component.scripts.map(start) +
+        "],\n\t" +
+        "components:[" +
+        component.components +
+        "],\n\t" +
+        "dom:" +
+        JSON.stringify(component.dom) +
+        "\n}"
+      );
     }
-  } else raw.push(item);
-}
-
-function reset() {
-  if (openRoots > 0) throw "unhandled Root Element";
-  raw.length = roots.length = rootHolder.length = 0;
-}
-
-function filter(c) {
-  if (isNum(c)) {
-    const component = parse(roots[c]);
-    return (
-      "{\n\t" +
-      "key:" +
-      c +
-      ",\n\t" +
-      "scripts:[" +
-      component.scripts.map(start) +
-      "],\n\t" +
-      "components:[" +
-      component.components +
-      "],\n\t" +
-      "dom:" +
-      JSON.stringify(component.dom) +
-      "\n}"
-    );
+    return c;
   }
-  return c;
 }
 
 function replacer(m) {
