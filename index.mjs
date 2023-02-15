@@ -3,13 +3,15 @@ import parse from "./xmlParser.mjs";
 
 const cut = String.prototype.slice === undefined ? "substring" : "slice",
   closingTagExp = /^<\/\w|\/>$/,
+  rootsExp = /\<\w/,
   fragExp = /\<\/?\>/g,
   fileSplitter = /(?=\<\/?\w)|(?<=\>)/g;
 
 export default start;
 function start(content) {
-  const fragFilled = content.replace(fragExp, replacer).split(fileSplitter);
-  return fragFilled.length > 1 ? parseContent(fragFilled) : content;
+  const fragFilled = content.replace(fragExp, replacer),
+    hasRoots = rootsExp.test(fragFilled);
+  return hasRoots ? parseContent(fragFilled.split(fileSplitter)) : content;
 }
 
 function parseContent(contentArr) {
