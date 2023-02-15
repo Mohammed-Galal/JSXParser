@@ -12,12 +12,11 @@ function start(content) {
   return fragFilled.length > 1 ? parseContent(fragFilled) : content;
 }
 
-let rootHolder = [],
-  openRoots = 0;
-
 function parseContent(contentArr) {
   const raw = [];
-  let key = 0;
+  let rootHolder = [],
+    openRoots = 0,
+    key = 0;
   contentArr.forEach(handleItem);
   return raw.join(emptyStr);
 
