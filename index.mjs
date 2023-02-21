@@ -3,9 +3,9 @@ import parse from "./xmlParser.mjs";
 
 const cut = String.prototype.slice === undefined ? "substring" : "slice",
   closingTagExp = /^<\/\w|\/>$/,
-  rootsExp = /\<\w/,
+  rootsExp = /\<[\w\.\-]+(?:\s*\/?\>|\s+\w\S+\=)/,
   fragExp = /\<\/?\>/g,
-  fileSplitter = /(?=\<\/?\w)|(?<=\>)/g;
+  fileSplitter = /(?=\<[\w\.\-]+(?:\s*\/?\>|\s+\w\S+\=))|(?<=\>)/g;
 
 export default start;
 function start(content) {
@@ -29,7 +29,7 @@ function parseContent(contentArr) {
       if (closingTagExp.test(item) && --openRoots === 0) {
         const component = parse(rootHolder.join(emptyStr)),
           result =
-            "{\n\t" +
+            "({\n\t" +
             "key:" +
             key++ +
             ",\n\t" +
@@ -41,7 +41,7 @@ function parseContent(contentArr) {
             "],\n\t" +
             "dom:" +
             JSON.stringify(component.dom) +
-            "\n}";
+            "\n})";
 
         rootHolder.length = 0;
         raw.push(result);
