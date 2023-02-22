@@ -1,5 +1,5 @@
 import catchScripts from "./scriptsCatcher.mjs";
-import { openingTagExp, emptyStr, isArray } from "./commonAssets.mjs";
+import { openingTagExp, emptyStr } from "./commonAssets.mjs";
 
 const domArrSplitExp = /(?=\<|\/\>)|\>\s*/g,
   closingTagExp = /^\<?\/\w?/,

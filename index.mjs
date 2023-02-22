@@ -3,7 +3,6 @@ import parse from "./xmlParser.mjs";
 
 const cut = String.prototype.slice === undefined ? "substring" : "slice",
   commentsExp = /\<\!--|--\>/g,
-  commentsExp = /\<\!--|--\>/g,
   fragExp = /\<\/?\>/g,
   closingTagExp = /^\<\/\w|\/\>$/,
   rootsExp = /\<\w[\w-.:]*(?:\s*\/?\>|\s*\w\S+\=)/,
@@ -11,9 +10,6 @@ const cut = String.prototype.slice === undefined ? "substring" : "slice",
 
 export default start;
 function start(content) {
-  const fragFilled = content
-      .replace(commentsExp, emptyStr)
-      .replace(fragExp, replacer),
   const fragFilled = content
       .replace(commentsExp, emptyStr)
       .replace(fragExp, replacer),
