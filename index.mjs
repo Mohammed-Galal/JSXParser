@@ -27,7 +27,7 @@ function parseContent(contentArr) {
 
   function handleItem(item) {
     if (openingTagExp.test(item)) openRoots++;
-    if (openRoots === 0) return raw.push(item);
+    else if (openRoots === 0) return raw.push(item);
     rootHolder.push(item);
     if (closingTagExp.test(item) && --openRoots === 0) {
       const component = parse(rootHolder.join(emptyStr)),
