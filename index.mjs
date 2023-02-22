@@ -2,14 +2,17 @@ import { openingTagExp, emptyStr } from "./commonAssets.mjs";
 import parse from "./xmlParser.mjs";
 
 const cut = String.prototype.slice === undefined ? "substring" : "slice",
-  closingTagExp = /^<\/\w|\/>$/,
-  rootsExp = /\<[\w\.\-]+(?:\s*\/?\>|\s+\w\S+\=)/,
+  commentsExp = /\<\!--|--\>/g,
   fragExp = /\<\/?\>/g,
-  fileSplitter = /(?=\<[\w\.\-]+(?:\s*\/?\>|\s+\w\S+\=))|(?<=\>)/g;
+  closingTagExp = /^\<\/\w|\/\>$/,
+  rootsExp = /\<\w[\w\.\-]*(?:\s*\/?\>|\s+\w\S+\=)/,
+  fileSplitter = /(?=\<\/\w)|(?=\<\w[\w\.\-]*(?:\s*\/?\>|\s+\w\S+\=))|(?<=\>)/g;
 
 export default start;
 function start(content) {
-  const fragFilled = content.replace(fragExp, replacer),
+  const fragFilled = content
+      .replace(commentsExp, emptyStr)
+      .replace(fragExp, replacer),
     hasRoots = rootsExp.test(fragFilled);
   return hasRoots ? parseContent(fragFilled.split(fileSplitter)) : content;
 }
@@ -24,29 +27,28 @@ function parseContent(contentArr) {
 
   function handleItem(item) {
     if (openingTagExp.test(item)) openRoots++;
-    if (openRoots > 0) {
-      rootHolder.push(item);
-      if (closingTagExp.test(item) && --openRoots === 0) {
-        const component = parse(rootHolder.join(emptyStr)),
-          result =
-            "({\n\t" +
-            "key:" +
-            key++ +
-            ",\n\t" +
-            "scripts:[" +
-            component.scripts.map(start) +
-            "],\n\t" +
-            "components:[" +
-            component.components +
-            "],\n\t" +
-            "dom:" +
-            JSON.stringify(component.dom) +
-            "\n})";
+    if (openRoots === 0) return raw.push(item);
+    rootHolder.push(item);
+    if (closingTagExp.test(item) && --openRoots === 0) {
+      const component = parse(rootHolder.join(emptyStr)),
+        result =
+          "({\n\t" +
+          "key:" +
+          key++ +
+          ",\n\t" +
+          "scripts:[" +
+          component.scripts.map(start) +
+          "],\n\t" +
+          "components:[" +
+          component.components +
+          "],\n\t" +
+          "dom:" +
+          JSON.stringify(component.dom) +
+          "\n})";
 
-        rootHolder.length = 0;
-        raw.push(result);
-      }
-    } else raw.push(item);
+      rootHolder.length = 0;
+      raw.push(result);
+    }
   }
 }
 
