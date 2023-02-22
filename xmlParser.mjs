@@ -28,9 +28,8 @@ export default function (str) {
 
 function parseXML() {
   let item = domArr[index++];
-  const isNotClosingTag = closingTagExp.test(item) === false;
-
-  if (openingTagExp.test(item)) {
+  if (closingTagExp.test(item)) return;
+  else if (openingTagExp.test(item)) {
     const node = item.replace(trimCharsExp, emptyStr).split(catchFirstSpaceExp),
       tag = (function () {
         const tagName = node[0];
@@ -44,22 +43,17 @@ function parseXML() {
 
     item = [tag, attrs];
 
+    const prevSiblings = siblings;
     if (domArr[index] !== "/") {
-      const children = (item[2] = []),
-        prevSiblings = siblings;
+      const children = (item[2] = []);
       siblings = children;
-      parseXML();
-      siblings = prevSiblings;
     }
-    if (siblings === null) return item;
-  }
-
-  if (isNotClosingTag) {
-    isArray(item)
-      ? siblings.push(item)
-      : item.split(/(?=\{)|(?<=\})/g).forEach(parseStr);
     parseXML();
-  }
+    siblings = prevSiblings;
+    if (siblings === null) return item;
+    siblings.push(item);
+  } else item.split(/(?=\{)|(?<=\})/g).forEach(parseStr);
+  parseXML();
 }
 
 function reset() {
