@@ -1,5 +1,5 @@
-import { openingTagExp, emptyStr } from "./commonAssets.mjs";
-import parse from "./xmlParser.mjs";
+const { openingTagExp, emptyStr } = require("./commonAssets.js");
+const parse = require("./xmlParser.js");
 
 const cut = String.prototype.slice === undefined ? "substring" : "slice",
   EXP = {
@@ -10,7 +10,7 @@ const cut = String.prototype.slice === undefined ? "substring" : "slice",
     fileSplit: /(?=\}|\<\/\w|\<\w[\w-.:]*(?:\s*\/?\>|\s+\w\S*\=))|(?<=\{|\>)/g,
   };
 
-export default start;
+module.exports = start;
 function start(content) {
   const fragFilled = content.replace(EXP.fragmentTag, replacer),
     hasRoots = EXP.rootCheck.test(fragFilled);

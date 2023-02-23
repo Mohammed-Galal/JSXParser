@@ -1,5 +1,5 @@
-import catchScripts from "./scriptsCatcher.mjs";
-import { openingTagExp, emptyStr } from "./commonAssets.mjs";
+const catchScripts = require("./scriptsCatcher.js");
+const { openingTagExp, emptyStr } = require("./commonAssets.js");
 
 const domArrSplitExp = /(?=\<|\/\>)|\>\s*/g,
   closingTagExp = /^\<?\/\w?/,
@@ -14,7 +14,7 @@ let siblings = null,
   endPos = null,
   index = 0;
 
-export default function (str) {
+module.exports = function (str) {
   const obj = catchScripts(str);
   domArr = obj.input.split(domArrSplitExp);
   endPos = domArr.length;
@@ -24,7 +24,7 @@ export default function (str) {
   reset();
   delete obj.input;
   return obj;
-}
+};
 
 function parseXML() {
   let item = domArr[index++];

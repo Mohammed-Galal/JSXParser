@@ -1,4 +1,4 @@
-import { emptyStr } from "./commonAssets.mjs";
+const { emptyStr } = require("./commonAssets.js");
 
 const splitterExp = /(?<=\{)|(?=\})/g,
   openScriptTagExp = /\{$/,
@@ -10,7 +10,7 @@ let scripts = [],
   pureContent = [],
   openScripts = 0;
 
-export default function (str) {
+module.exports = function (str) {
   const matched = str.match(splitterExp);
   if (matched && matched.length % 2 !== 0) throw "unhandled Script";
   else if (hasScripts.test(str)) {
@@ -23,7 +23,7 @@ export default function (str) {
       input: rawContent.join(emptyStr),
     };
   } else return { scripts, input: str };
-}
+};
 
 function catchScript(item) {
   if (openScripts === 0) pureContent.push(item);
