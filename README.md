@@ -1,12 +1,9 @@
 # JSXParser
 
-JSXParser is a tiny javascript library, that takes a string as input, then parses it's jsx roots, and returns the string with ths jsx roots fully parsed.
+JSXParser is a tiny javascript library, that is intended to be installed with webpack.
 
-> the main purpose of making such a function, is that **babel/parser** doesn't give the flexbility, specially, when it comes to create a new javascript library like **react or vue**, as we are the front-end-developers rely heavely on such frameworks.
-
+> the main purpose of making such a function, is that **babel/parser** doesn't provide the flexbility and easines to create a new javascript library like **react or vue**.
 > so I decided to make my own jsx parser, that achieves the easiness and flexibility of creating a new framework, and manipulating the DOM Tree.
-
-!!! / this parser is intended to work along with webpack.
 
 input
 
