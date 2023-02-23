@@ -4,7 +4,9 @@ JSXParser is a tiny javascript library, that takes a string as input, then parse
 
 > the main purpose of making such a function, is that **babel/parser** doesn't give the flexbility, specially, when it comes to create a new javascript library like **react or vue**, as we are the front-end-developers rely heavely on such frameworks.
 
-> so I decided to make my own jsx parser, that acchieves the easinness and flexbility of creating a new framework, and manipulating the DOM Tree.
+> so I decided to make my own jsx parser, that achieves the easinness and flexbility of creating a new framework, and manipulating the DOM Tree.
+
+!!! / this parser is intended to work along with webpack.
 
 / input
 
@@ -52,3 +54,269 @@ const root = {
   > the dom structure, and follows the scheme of [tagName, [attrs], [children]].
 
   !!! . please note that if element is a component, the component reffrence will be stored in the components array and the element's tagName gets replaced with the component index in the array.
+
+- **normalElement:**
+  input:
+
+  ```javascript
+  <h1>normal element</h1>
+  ```
+
+  output:
+
+  ```javascript
+  ({
+    key: 0,
+    scripts: [],
+    components: [],
+    dom: ["h1", [], ["normal element"]],
+  });
+  ```
+
+- **fragmentElement:**
+  input:
+
+  ```javascript
+  <>this is fragment Element</>
+  ```
+
+  output:
+
+  ```javascript
+  ({
+    key: 0,
+    scripts: [],
+    components: [],
+    dom: ["fragment", [], ["this is fragment Element"]],
+  });
+  ```
+
+- **dynamicValues:**
+  input:
+
+  ```javascript
+  <h1 calssName={"lorem ipsum"}>hello {"world"}</h1>
+  ```
+
+  output:
+
+  ```javascript
+  ({
+    key: 0,
+    scripts: ["lorem ipsum", "world"],
+    components: [],
+    dom: ["h1", ["calssName={0}"], ["hello ", 1]],
+  });
+  ```
+
+- **nestedElements:**
+  input:
+
+  ```javascript
+  <h1 id="parent">
+    hello <span id="child">world</span>
+  </h1>
+  ```
+
+  output:
+
+  ```javascript
+  ({
+    key: 0,
+    scripts: [],
+    components: [],
+    dom: [
+      "h1",
+      ["id='parent'"],
+      ["hello ", ["span", ["id='child'"], ["world"]]],
+    ],
+  });
+  ```
+
+- **componentElement:**
+  input:
+
+  ```javascript
+  <Header>this is a component that has children</Header>
+  ```
+
+  output:
+
+  ```javascript
+  ({
+    key: 0,
+    scripts: [],
+    components: [Header],
+    dom: [0, [], ["this is a component that has children"]],
+  });
+  ```
+
+- **realLife React Content:**
+
+  input:
+
+  ```javascript
+  const UserContext = React.createContext({
+    username: "johnny-appleseed",
+    firstName: "John",
+    lastName: "Appleseed",
+  });
+  const UserConsumer = UserContext.Consumer;
+
+  class App extends React.Component {
+    state = {
+      user: {
+        username: "jioke",
+        firstName: "Kingsley",
+        lastName: "Silas",
+      },
+    };
+
+    render() {
+      return (
+        <div className="box">
+          <User />
+        </div>
+      );
+    }
+  }
+
+  const User = () => (
+    <div>
+      <UserProfile />
+    </div>
+  );
+
+  const UserProfile = (props) => (
+    <UserConsumer>
+      {(context) => {
+        return (
+          <div>
+            <div className="subtitle">Profile Page for</div>
+            <h1 className="title">{context.username}</h1>
+            <UserDetails />
+          </div>
+        );
+      }}
+    </UserConsumer>
+  );
+
+  const UserDetails = () => (
+    <div>
+      <UserConsumer>
+        {(context) => {
+          return (
+            <div>
+              <p>
+                <b>Username:</b> {context.username}
+              </p>
+              <p>
+                <b>First Name:</b> {context.firstName}
+              </p>
+              <p>
+                <b>Last Name:</b> {context.lastName}
+              </p>
+            </div>
+          );
+        }}
+      </UserConsumer>
+    </div>
+  );
+
+  ReactDOM.render(<App />, document.getElementById("root"));
+  ```
+
+  output:
+
+  ```javascript
+  const UserContext = React.createContext({
+    username: "johnny-appleseed",
+    firstName: "John",
+    lastName: "Appleseed",
+  });
+  const UserConsumer = UserContext.Consumer;
+
+  class App extends React.Component {
+    state = {
+      user: {
+        username: "jioke",
+        firstName: "Kingsley",
+        lastName: "Silas",
+      },
+    };
+
+    render() {
+      return {
+        key: 0,
+        scripts: [],
+        components: [User],
+        dom: ["div", ['className="box"'], [[0, []]]],
+      };
+    }
+  }
+
+  const User = () => ({
+    key: 1,
+    scripts: [],
+    components: [UserProfile],
+    dom: ["div", [], [[0, []]]],
+  });
+
+  const UserProfile = (props) => ({
+    key: 2,
+    scripts: [
+      (context) => {
+        return {
+          key: 0,
+          scripts: [context.username],
+          components: [UserDetails],
+          dom: [
+            "div",
+            [],
+            [
+              ["div", ['className="subtitle"'], ["Profile Page for"]],
+              ["h1", ['className="title"'], [0]],
+              [0, []],
+            ],
+          ],
+        };
+      },
+    ],
+    components: [],
+    dom: ["UserConsumer", [], [0, "\n  "]],
+  });
+
+  const UserDetails = () => ({
+    key: 3,
+    scripts: [
+      (context) => {
+        return {
+          key: 0,
+          scripts: [context.username, context.firstName, context.lastName],
+          components: [],
+          dom: [
+            "div",
+            [],
+            [
+              ["p", [], [["b", [], ["Username:"]], 0]],
+              ["p", [], [["b", [], ["First Name:"]], 1]],
+              ["p", [], [["b", [], ["Last Name:"]], 2]],
+            ],
+          ],
+        };
+      },
+    ],
+    components: [UserConsumer],
+    dom: ["div", [], [[0, [], [0, "\n    "]]]],
+  });
+
+  ReactDOM.render(
+    {
+      key: 4,
+      scripts: [],
+      components: [App],
+      dom: [0, []],
+    },
+    document.getElementById("root")
+  );
+  ```
