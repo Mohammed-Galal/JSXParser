@@ -4,11 +4,11 @@ JSXParser is a tiny javascript library, that takes a string as input, then parse
 
 > the main purpose of making such a function, is that **babel/parser** doesn't give the flexbility, specially, when it comes to create a new javascript library like **react or vue**, as we are the front-end-developers rely heavely on such frameworks.
 
-> so I decided to make my own jsx parser, that achieves the easinness and flexbility of creating a new framework, and manipulating the DOM Tree.
+> so I decided to make my own jsx parser, that achieves the easiness and flexibility of creating a new framework, and manipulating the DOM Tree.
 
 !!! / this parser is intended to work along with webpack.
 
-/ input
+input
 
 ```javascript
 // index.js
@@ -23,7 +23,7 @@ const content = `
 console.log(JSXParser(content));
 ```
 
-// output
+output
 
 ```javascript
 // some js code
@@ -53,9 +53,12 @@ const root = {
 
   > the dom structure, and follows the scheme of [tagName, [attrs], [children]].
 
-  !!! . please note that if element is a component, the component reffrence will be stored in the components array and the element's tagName gets replaced with the component index in the array.
+  !!! . please note that if element is a component, the component reference will be stored in the components array and the element's tagName gets replaced with the reference index in the array.
+
+## Some Examples
 
 - **normalElement:**
+
   input:
 
   ```javascript
@@ -74,6 +77,7 @@ const root = {
   ```
 
 - **fragmentElement:**
+
   input:
 
   ```javascript
@@ -92,6 +96,7 @@ const root = {
   ```
 
 - **dynamicValues:**
+
   input:
 
   ```javascript
@@ -110,6 +115,7 @@ const root = {
   ```
 
 - **nestedElements:**
+
   input:
 
   ```javascript
@@ -134,6 +140,7 @@ const root = {
   ```
 
 - **componentElement:**
+
   input:
 
   ```javascript
@@ -151,7 +158,7 @@ const root = {
   });
   ```
 
-- **realLife React Content:**
+- ### real life React Content:
 
   input:
 
@@ -282,8 +289,8 @@ const root = {
         };
       },
     ],
-    components: [],
-    dom: ["UserConsumer", [], [0, "\n  "]],
+    components: [UserConsumer],
+    dom: [0, [], [0, "\n  "]],
   });
 
   const UserDetails = () => ({

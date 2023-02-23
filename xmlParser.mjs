@@ -4,7 +4,7 @@ import { openingTagExp, emptyStr } from "./commonAssets.mjs";
 const domArrSplitExp = /(?=\<|\/\>)|\>\s*/g,
   closingTagExp = /^\<?\/\w?/,
   catchFirstSpaceExp = /(?<=^\S+)\s+/g,
-  isComponentExp = /^[A-Z]|\./g,
+  isComponentExp = /^[A-Z]|\./,
   trimCharsExp = /^\<|\s*$/g,
   attrsParseExp = /\s+(?=\S+\=|\{\d+\})/g;
 
@@ -31,29 +31,30 @@ function parseXML() {
   if (closingTagExp.test(item)) return;
   else if (openingTagExp.test(item)) {
     const node = item.replace(trimCharsExp, emptyStr).split(catchFirstSpaceExp),
-      tag = (function () {
-        const tagName = node[0];
-        if (isComponentExp.test(tagName)) {
-          const isExisted = components.indexOf(tagName);
-          return isExisted > -1 ? isExisted : components.push(tagName) - 1;
-        }
-        return tagName;
-      })(),
+      tag = checkTag(node[0]),
       attrs = node[1] ? node[1].split(attrsParseExp) : [];
 
     item = [tag, attrs];
 
-    const prevSiblings = siblings;
     if (domArr[index] !== "/") {
-      const children = (item[2] = []);
+      const prevSiblings = siblings,
+        children = (item[2] = []);
       siblings = children;
+      parseXML();
+      siblings = prevSiblings;
     }
-    parseXML();
-    siblings = prevSiblings;
     if (siblings === null) return item;
     siblings.push(item);
   } else item.split(/(?=\{)|(?<=\})/g).forEach(parseStr);
   parseXML();
+}
+
+function checkTag(tagName) {
+  if (isComponentExp.test(tagName)) {
+    const isExisted = components.indexOf(tagName);
+    return isExisted > -1 ? isExisted : components.push(tagName) - 1;
+  }
+  return tagName;
 }
 
 function reset() {
