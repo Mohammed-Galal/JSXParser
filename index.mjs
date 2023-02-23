@@ -2,7 +2,7 @@ import { openingTagExp, emptyStr } from "./commonAssets.mjs";
 import parse from "./xmlParser.mjs";
 
 const cut = String.prototype.slice === undefined ? "substring" : "slice",
-  commentsExp = /\<\!--|--\>/g,
+  commentsExp = /\<\!--[^]+--\>/g,
   fragExp = /\<\/?\>/g,
   closingTagExp = /^\<\/\w|\/\>$/,
   rootsExp = /\<\w[\w-.:]*(?:\s*\/?\>|\s*\w\S+\=)/,
