@@ -7,7 +7,7 @@ const emptyArr = [],
   catchFirstSpaceExp = /(?<=^\S+)\s+/,
   isComponentExp = /^[A-Z]|\./,
   trimCharsExp = /^\<|\s*$/g,
-  attrsParseExp = /\s+(?=\S+\=|\{\d+\})/g;
+  attrsParseExp = /\S+=(?<tag>["'])[^]*?(?<!\\)\k<tag>/g;
 
 let siblings = null,
   domArr = null,
@@ -33,7 +33,7 @@ function parseXML() {
   else if (openingTagExp.test(item)) {
     item = item.replace(trimCharsExp, emptyStr).split(catchFirstSpaceExp);
     item[0] = checkTag(item[0]);
-    item[1] = item[1] ? item[1].split(attrsParseExp) : emptyArr;
+    item[1] = item[1] ? item[1].match(attrsParseExp) : emptyArr;
 
     const prevSiblings = siblings;
     if (domArr[index] !== "/") siblings = item[2] = [];
