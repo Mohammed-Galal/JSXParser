@@ -1,10 +1,10 @@
-const catchScripts = require("./scriptsCatcher.js");
-const { openingTagExp, emptyStr } = require("./commonAssets.js");
+const catchScripts = require("./scriptsCatcher.js"),
+  { openingTagExp, emptyStr } = require("./commonAssets.js");
 
 const emptyArr = [],
   domArrSplitExp = /(?=\<|\/\>)|\>\s*/g,
   closingTagExp = /^\<?\/\w?/,
-  catchFirstSpaceExp = /(?<=^\S+)\s+/g,
+  catchFirstSpaceExp = /(?<=^\S+)\s+/,
   isComponentExp = /^[A-Z]|\./,
   trimCharsExp = /^\<|\s*$/g,
   attrsParseExp = /\s+(?=\S+\=|\{\d+\})/g;
@@ -29,23 +29,23 @@ module.exports = function (str) {
 
 function parseXML() {
   let item = domArr[index++];
-  if (closingTagExp.test(item)) return;
+  if (closingTagExp.test(item)) emptyStr;
   else if (openingTagExp.test(item)) {
     item = item.replace(trimCharsExp, emptyStr).split(catchFirstSpaceExp);
     item[0] = checkTag(item[0]);
     item[1] = item[1] ? item[1].split(attrsParseExp) : emptyArr;
 
     if (domArr[index] !== "/") {
-      const prevSiblings = siblings,
-        children = (item[2] = []);
-      siblings = children;
+      const prevSiblings = siblings;
+      siblings = item[2] = [];
       parseXML();
       siblings = prevSiblings;
     }
+
     if (siblings === null) return item;
     siblings.push(item);
   } else item.split(/(?=\{)|(?<=\})/g).forEach(parseStr);
-  index < endPos && parseXML();
+  endPos > index && parseXML();
 }
 
 function checkTag(tagName) {
