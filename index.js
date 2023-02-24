@@ -3,7 +3,7 @@ const parse = require("./xmlParser.js");
 
 const cut = String.prototype.slice === undefined ? "substring" : "slice",
   EXP = {
-    comments: /\<\!--[^]+--\>/g,
+    comments: /\<\!--[^]+?--\>/g,
     fragmentTag: /\<\/?\>/g,
     closingTag: /^\<\/\w|\/\>$/,
     rootCheck: /\<\w[\w-.:]*(?:\s*\/?\>|\s*\w\S+\=)/,
@@ -32,9 +32,8 @@ function parseContent(contentArr) {
     else if (openRoots === 0) return raw.push(item);
     rootHolder.push(item);
     if (EXP.closingTag.test(item) && --openRoots === 0) {
-      const rootStr = rootHolder.join(emptyStr);
-      if (/^\<str:/.test(rootHolder[0])) return raw.push(rootStr);
-      const component = parse(rootStr.replace(EXP.comments, emptyStr)),
+      const rootStr = rootHolder.join(emptyStr),
+        component = parse(rootStr.replace(EXP.comments, emptyStr)),
         result =
           "({\n\t" +
           "key:" +
