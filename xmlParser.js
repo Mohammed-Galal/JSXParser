@@ -1,5 +1,5 @@
 const catchScripts = require("./scriptsCatcher.js"),
-  { openingTagExp, emptyStr } = require("./commonAssets.js");
+  { openingTagExp, emptyStr, isArray } = require("./commonAssets.js");
 
 const emptyArr = [],
   domArrSplitExp = /(?=\<|\/\>)|\>\s*/g,
@@ -29,18 +29,16 @@ module.exports = function (str) {
 
 function parseXML() {
   let item = domArr[index++];
-  if (closingTagExp.test(item)) emptyStr;
+  if (closingTagExp.test(item)) return;
   else if (openingTagExp.test(item)) {
     item = item.replace(trimCharsExp, emptyStr).split(catchFirstSpaceExp);
     item[0] = checkTag(item[0]);
     item[1] = item[1] ? item[1].split(attrsParseExp) : emptyArr;
 
-    if (domArr[index] !== "/") {
-      const prevSiblings = siblings;
-      siblings = item[2] = [];
-      parseXML();
-      siblings = prevSiblings;
-    }
+    const prevSiblings = siblings;
+    if (domArr[index] !== "/") siblings = item[2] = [];
+    parseXML();
+    siblings = prevSiblings;
 
     if (siblings === null) return item;
     siblings.push(item);
