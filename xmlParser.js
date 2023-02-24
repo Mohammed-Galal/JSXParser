@@ -43,7 +43,7 @@ function parseXML() {
     if (siblings === null) return item;
     siblings.push(item);
   } else item.split(/(?=\{)|(?<=\})/g).forEach(parseStr);
-  endPos > index && parseXML();
+  parseXML();
 }
 
 function checkTag(tagName) {
