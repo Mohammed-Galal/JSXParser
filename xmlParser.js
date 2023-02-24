@@ -7,7 +7,7 @@ const emptyArr = [],
   catchFirstSpaceExp = /(?<=^\S+)\s+/,
   isComponentExp = /^[A-Z]|\./,
   trimCharsExp = /^\<|\s*$/g,
-  attrsParseExp = /\S+=(?<tag>["'])[^]*?(?<!\\)\k<tag>/g;
+  attrsParseExp = /\S+=(?<tag>["'{])[^]*?(?<!\\)\k<tag>/g;
 
 let siblings = null,
   domArr = null,
