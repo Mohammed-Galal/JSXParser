@@ -6,8 +6,8 @@ const cut = String.prototype.slice === undefined ? "substring" : "slice",
     comments: /\<\!--[^]+?--\>/g,
     fragmentTag: /\<\/?\>/g,
     closingTag: /^\<\/\w|\/\>$/,
-    rootCheck: /\<\w[\w-.:]*(?:\s*\/?\>|\s*\w\S+\=)/,
-    fileSplit: /(?=\}|\<\/\w|\<\w[\w-.:]*(?:\s*\/?\>|\s+\w\S*\=))|(?<=\{|\>)/g,
+    rootCheck: /\<\w\S*(?:\s*\/?\>|\s+\w\S*)/,
+    fileSplit: /(?=\<\/\w|\<\w\S*(?:\s*\/?\>|\s+\w\S*))|(?<=\>)/g,
   };
 
 module.exports = start;
