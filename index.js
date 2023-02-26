@@ -29,7 +29,7 @@ function start(content) {
     return (
       "({\n\t" +
       "key:" +
-      key++ +
+      index +
       ",\n\t" +
       "scripts:[" +
       component.scripts.map(start) +
@@ -44,7 +44,6 @@ function start(content) {
   }
 }
 
-let key = 0;
 function gatherRoots(str) {
   const contentArr = str.split(EXP.fileSplit),
     roots = [],
