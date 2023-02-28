@@ -7,7 +7,7 @@ const underScore = "_",
   cut = String.prototype.slice === undefined ? "substring" : "slice",
   EXP = {
     strings: /(?<tag>["'`])[^]*?(?<!\\)\k<tag>/g,
-    comments: /\<\!--[^]+?--\>/g,
+    comments: /\<\!--[^]*?--\>/g,
     fragmentTag: /\<\/?\>/g,
     closingTag: /^\<\/\w|\/\>$/,
     rootCheck: /\<\w\S*(?:\s*\/?\>|\s+\w\S*)/,
