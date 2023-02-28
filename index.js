@@ -2,6 +2,7 @@ const { openingTagExp, emptyStr } = require("./commonAssets.js"),
   parse = require("./xmlParser.js");
 
 const underScore = "_",
+  rootHolder = [],
   repeat = (m) => underScore.repeat(m.length),
   cut = String.prototype.slice === undefined ? "substring" : "slice",
   EXP = {
@@ -22,8 +23,7 @@ function start(content) {
 
 function gatherRoots(str, stringsRemoved) {
   const contentArr = str.split(EXP.fileSplit),
-    CONTENT = [],
-    rootHolder = [];
+    CONTENT = [];
 
   let openRoots = 0,
     currentPos = 0;
@@ -37,22 +37,18 @@ function gatherRoots(str, stringsRemoved) {
     rootHolder.push(item);
     if (EXP.closingTag.test(item) && --openRoots === 0) {
       const rootStr = rootHolder.join(emptyStr),
-        rootIndex = stringsRemoved.indexOf(
-          rootStr.replace(EXP.strings, repeat),
-          currentPos
-        );
+        rootIndex = str.indexOf(rootStr, currentPos),
+        isJSXIdentifire = stringsRemoved.charAt(rootIndex) === "<",
+        lastpoint = rootIndex + rootStr.length;
 
       rootHolder.length = 0;
-      if (rootIndex === -1) return;
 
-      const realIndex = str.indexOf(rootStr, currentPos);
-
-      if (rootIndex === realIndex) {
+      if (isJSXIdentifire) {
         CONTENT.push(str[cut](currentPos, rootIndex));
-        currentPos = rootIndex + rootStr.length;
-        CONTENT.push(handleRoot(rootStr, rootIndex));
+        currentPos = lastpoint;
+        const result = handleRoot(rootStr, rootIndex);
+        CONTENT.push(result);
       } else {
-        const lastpoint = realIndex + rootStr.length;
         CONTENT.push(str[cut](currentPos, lastpoint));
         currentPos = lastpoint;
       }
