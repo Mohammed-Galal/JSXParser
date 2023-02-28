@@ -1,65 +1,79 @@
-const catchScripts = require("./scriptsCatcher.js"),
-  { openingTagExp, emptyStr, isArray } = require("./commonAssets.js");
+const { openingTagExp, emptyStr } = require("./commonAssets.js"),
+  parse = require("./xmlParser.js");
 
-const emptyArr = [],
-  domArrSplitExp = /(?=\<|\/\>)|\>\s*/g,
-  closingTagExp = /^\<?\/\w?/,
-  catchFirstSpaceExp = /(?<=^\S+)\s+/,
-  isComponentExp = /^[A-Z]|\./,
-  trimCharsExp = /^\<|\s*$/g,
-  attrsParseExp = /\S+=\{\d+\}|\S+=(?<tag>["'])[^]*?(?<!\\)\k<tag>/g;
+const underScore = "_",
+  rootHolder = [],
+  repeat = (m) => underScore.repeat(m.length),
+  cut = String.prototype.slice === undefined ? "substring" : "slice",
+  EXP = {
+    strings: /(?<tag>["'`])[^]*?(?<!\\)\k<tag>/g,
+    comments: /\<\!--[^]+?--\>/g,
+    fragmentTag: /\<\/?\>/g,
+    closingTag: /^\<\/\w|\/\>$/,
+    rootCheck: /\<\w\S*(?:\s*\/?\>|\s+\w\S*)/,
+    fileSplit: /(?=\<\/\w|\<\w\S*(?:\s*\/?\>|\s+\w\S*))|(?<=\>)/g,
+  };
 
-let siblings = null,
-  domArr = null,
-  components = null,
-  endPos = null,
-  index = 0;
-
-module.exports = function (str) {
-  const obj = catchScripts(str);
-  domArr = obj.input.split(domArrSplitExp);
-  endPos = domArr.length;
-  components = [];
-  obj.dom = parseXML();
-  obj.components = components;
-  reset();
-  delete obj.input;
-  return obj;
-};
-
-function parseXML() {
-  let item = domArr[index++];
-  if (closingTagExp.test(item)) return;
-  else if (openingTagExp.test(item)) {
-    item = item.replace(trimCharsExp, emptyStr).split(catchFirstSpaceExp);
-    item[0] = checkTag(item[0]);
-    item[1] = item[1] ? item[1].match(attrsParseExp) : emptyArr;
-
-    const prevSiblings = siblings;
-    if (domArr[index] !== "/") siblings = item[2] = [];
-    parseXML();
-    siblings = prevSiblings;
-
-    if (siblings === null) return item;
-    siblings.push(item);
-  } else item.split(/(?=\{)|(?<=\})/g).forEach(parseStr);
-  parseXML();
+module.exports = start;
+function start(content) {
+  const fragFilled = content.replace(EXP.fragmentTag, replacer),
+    stringsRemoved = fragFilled.replace(EXP.strings, repeat);
+  return gatherRoots(fragFilled, stringsRemoved);
 }
 
-function checkTag(tagName) {
-  if (isComponentExp.test(tagName)) {
-    const isExisted = components.indexOf(tagName);
-    return isExisted > -1 ? isExisted : components.push(tagName) - 1;
+function gatherRoots(str, stringsRemoved) {
+  const contentArr = str.split(EXP.fileSplit),
+    CONTENT = [];
+
+  let openRoots = 0,
+    currentPos = 0;
+
+  contentArr.forEach(handleItem);
+  return CONTENT.concat(str[cut](currentPos)).join(emptyStr);
+
+  function handleItem(item) {
+    if (openingTagExp.test(item)) openRoots++;
+    else if (openRoots === 0) return;
+    rootHolder.push(item);
+    if (EXP.closingTag.test(item) && --openRoots === 0) {
+      const rootStr = rootHolder.join(emptyStr),
+        rootIndex = str.indexOf(rootStr, currentPos),
+        isJSXIdentifire = stringsRemoved.charAt(rootIndex) === "<",
+        lastpoint = rootIndex + rootStr.length;
+
+      rootHolder.length = 0;
+
+      if (isJSXIdentifire) {
+        CONTENT.push(str[cut](currentPos, rootIndex));
+        currentPos = lastpoint;
+        CONTENT.push(handleRoot(rootStr, rootIndex));
+      } else {
+        CONTENT.push(str[cut](currentPos, lastpoint));
+        currentPos = lastpoint;
+      }
+    }
   }
-  return tagName;
 }
 
-function reset() {
-  components = domArr = endPos = null;
-  index = 0;
+function replacer(m) {
+  return m[cut](0, -1) + "fragment>";
 }
 
-function parseStr(str) {
-  if (str !== emptyStr)
-    siblings.push(str[0] === "{" ? Number(str.slice(1, -1)) : str);
+function handleRoot(R, index) {
+  const component = parse(R.replace(EXP.comments, emptyStr));
+  return (
+    "({\n\t" +
+    "key:" +
+    index +
+    ",\n\t" +
+    "scripts:[" +
+    component.scripts.map(start) +
+    "],\n\t" +
+    "components:[" +
+    component.components +
+    "],\n\t" +
+    "dom:" +
+    JSON.stringify(component.dom) +
+    "\n})"
+  );
 }
